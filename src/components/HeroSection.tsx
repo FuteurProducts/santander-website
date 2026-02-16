@@ -307,22 +307,37 @@ export function HeroSection() {
               </AnimatePresence>
             </motion.div>
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.4 }}
-              className="pt-4"
+              className="pt-4 flex flex-col sm:flex-row gap-3 sm:gap-4"
             >
-              <Link to="/contact">
-                <Button 
-                  size="lg" 
+              <Link to="/contact" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
                   className="bg-[#EC0000] hover:bg-[#CC0000] text-white font-semibold text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 h-auto rounded-full transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group font-sans touch-manipulation w-full sm:w-auto"
                 >
                   Contact Sales
                   <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
+              <a
+                href="https://sandbox.futeurcredx.com/demo/santander"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto"
+              >
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-[#EC0000]/40 text-[#EC0000] hover:bg-[#EC0000]/10 font-semibold text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 h-auto rounded-full transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group font-sans touch-manipulation w-full sm:w-auto"
+                >
+                  Try Live Demo
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </a>
             </motion.div>
 
             {/* Tagline */}
