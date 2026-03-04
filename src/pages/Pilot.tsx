@@ -91,16 +91,42 @@ export default function Pilot() {
     try {
       pilotFormSchema.parse(formData);
       setIsSubmitting(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast({
-        title: "Application Submitted",
-        description: "We'll contact you within 24 hours.",
+
+      const response = await fetch('https://api.sandbox.futeurcredx.com/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          message: `Pilot Application\nTitle: ${formData.title}\nConsent: ${formData.consent ? 'Yes' : 'No'}`,
+          source_site: 'santander.futeurcredx.com',
+          source_form: 'request_pilot',
+        }),
       });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: "Application Submitted",
+          description: "We'll contact you within 24 hours.",
+        });
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
           title: "Error",
           description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        console.error("Form submission error:", error);
+        toast({
+          title: "Submission Error",
+          description: "There was an error submitting your application. Please try again.",
           variant: "destructive",
         });
       }

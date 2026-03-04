@@ -56,7 +56,7 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.message) {
       setSubmitStatus("error");
@@ -69,41 +69,24 @@ export default function Contact() {
     setErrorMessage("");
 
     try {
-      // Prepare template parameters
-      const templateParams = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        fullName: `${formData.firstName} ${formData.lastName}`.trim(),
-        company: formData.company || "Not provided",
-        email: formData.email,
-        phone: formData.phone || "Not provided",
-        country: formData.country || "Not provided",
-        message: formData.message,
-        time: new Date().toLocaleString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          timeZoneName: "short"
-        })
-      };
+      const response = await fetch('https://api.sandbox.futeurcredx.com/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          phone: formData.phone || '',
+          company: formData.company || '',
+          message: `${formData.message}\n\nCountry: ${formData.country || 'Not provided'}`,
+          source_site: 'santander.futeurcredx.com',
+          source_form: 'contact_sales',
+        }),
+      });
 
-      console.log("Sending email with params:", templateParams);
+      const result = await response.json();
 
-      // Send email via EmailJS
-      const response = await emailjs.send(
-        "service_xfyl449", // Service ID
-        "template_xtof4cg", // Template ID
-        templateParams
-      );
-
-      console.log("EmailJS response:", response);
-
-      if (response.status === 200) {
+      if (result.success) {
         setSubmitStatus("success");
-        // Reset form
         setFormData({
           firstName: "",
           lastName: "",
@@ -114,27 +97,12 @@ export default function Contact() {
           message: ""
         });
       } else {
-        throw new Error(`EmailJS returned status: ${response.status}`);
+        throw new Error(result.message);
       }
     } catch (error: any) {
-      console.error("EmailJS error details:", error);
-      console.error("Full error object:", JSON.stringify(error, null, 2));
-      
-      const errorMsg = error?.text || error?.message || error?.toString() || "Unknown error occurred";
-      console.error("Error message:", errorMsg);
-      
+      console.error("Form submission error:", error);
       setSubmitStatus("error");
-      
-      // More specific error messages
-      if (error?.text?.includes("Invalid") || error?.text?.includes("not found")) {
-        setErrorMessage("Invalid service or template ID. Please verify service_xfyl449 and template_xtof4cg are correct in your EmailJS dashboard.");
-      } else if (error?.text?.includes("Failed") || error?.status === 0) {
-        setErrorMessage("Network error. Please check your internet connection and try again.");
-      } else if (error?.text?.includes("public key") || error?.text?.includes("unauthorized")) {
-        setErrorMessage("EmailJS authentication failed. You may need to add your public key. Check the browser console for details.");
-      } else {
-        setErrorMessage(`Error: ${errorMsg}. Check browser console (F12) for more details.`);
-      }
+      setErrorMessage("Something went wrong. Please try again or contact us directly.");
     } finally {
       setIsSubmitting(false);
     }
